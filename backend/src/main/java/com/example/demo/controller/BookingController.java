@@ -56,8 +56,8 @@ public class BookingController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
-        bookingService.getById(id);
-        return ResponseEntity.ok(Map.of("message", "Booking deleted"));
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        bookingService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

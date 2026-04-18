@@ -93,6 +93,11 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
+    public void delete(Long id) {
+        Booking booking = getById(id);
+        bookingRepository.delete(booking);
+    }
+
     public Booking cancel(Long id) {
         Booking booking = getById(id);
         if (booking.getStatus() != Booking.BookingStatus.APPROVED) {
