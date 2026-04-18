@@ -1,17 +1,27 @@
 import React, { useState } from 'react'
-import { Building2 } from 'lucide-react'
+import { GraduationCap, CheckCircle2, Wifi, ShieldCheck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 
 const DEMO_ACCOUNTS = [
-  { label: 'Admin-Kalani',   email: 'admin@campus.edu', role: 'ADMIN'   },
-  { label: 'Staff',   email: 'bob@campus.edu',   role: 'STAFF'   },
-  { label: 'Student', email: 'alice@campus.edu', role: 'STUDENT' },
-  { label: 'Student', email: 'carol@campus.edu', role: 'STUDENT' },
+  { label: 'Admin',   email: 'admin@campus.edu',  role: 'ADMIN'   },
+  { label: 'Staff',   email: 'bob@campus.edu',     role: 'STAFF'   },
+  { label: 'Student', email: 'alice@campus.edu',   role: 'STUDENT' },
+  { label: 'Student', email: 'carol@campus.edu',   role: 'STUDENT' },
 ]
 
-const ROLE_COLOR = { ADMIN: '#4f6ef7', STAFF: '#8b5cf6', STUDENT: '#059669' }
+const ROLE_TAG = {
+  ADMIN:   { bg: '#134e4a', color: '#5eead4' },
+  STAFF:   { bg: '#1e3a5f', color: '#7dd3fc' },
+  STUDENT: { bg: '#3b1f5e', color: '#c4b5fd' },
+}
+
+const FEATURES = [
+  { icon: CheckCircle2, text: 'Book lecture halls, labs & equipment instantly' },
+  { icon: Wifi,         text: 'Real-time availability & conflict detection' },
+  { icon: ShieldCheck,  text: 'Role-based access — Admin, Staff, Student' },
+]
 
 export default function LoginPage() {
   const { login }  = useAuth()
@@ -34,81 +44,66 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex',
-      background: 'linear-gradient(135deg, #f0f3ff 0%, #f5f0ff 50%, #f0f7ff 100%)',
+      background: '#0f172a',
+      fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     }}>
-      {/* Left panel — branding */}
+      {/* Left: form panel */}
       <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        padding: '48px', background: 'linear-gradient(150deg, #4f6ef7 0%, #8b5cf6 100%)',
-        position: 'relative', overflow: 'hidden',
+        width: 460, display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', padding: '56px 48px',
+        background: '#1e293b',
+        borderRight: '1px solid #334155',
       }}>
-        {/* Decorative circles */}
-        <div style={{ position: 'absolute', width: 400, height: 400, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', top: -100, left: -100 }} />
-        <div style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.08)', bottom: -80, right: -80 }} />
-        <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', bottom: 80, left: 40 }} />
-
-        <div style={{ position: 'relative', textAlign: 'center', color: '#fff', maxWidth: 340 }}>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 40 }}>
           <div style={{
-            width: 72, height: 72, borderRadius: 20, margin: '0 auto 28px',
-            background: 'rgba(255,255,255,0.15)',
-            border: '1px solid rgba(255,255,255,0.25)',
+            width: 38, height: 38, borderRadius: 10,
+            background: 'linear-gradient(135deg, #0d9488, #0891b2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backdropFilter: 'blur(8px)',
           }}>
-            <Building2 size={34} color="#fff" />
+            <GraduationCap size={20} color="#fff" />
           </div>
-          <h1 style={{ fontFamily: "'Plus Jakarta Sans'", fontSize: 32, fontWeight: 700, letterSpacing: '-0.5px', marginBottom: 12 }}>
-            Smart Campus by Krishan Explains
-          </h1>
-          <p style={{ fontSize: 15, opacity: 0.75, lineHeight: 1.6 }}>
-            Manage campus resources, bookings, and incidents - all in one place.
-          </p>
-
-          <div style={{ marginTop: 48, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {['Resource Booking', 'Incident Tickets', 'Real-time Notifications'].map(f => (
-              <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px' }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 500 }}>{f}</span>
-              </div>
-            ))}
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.3px' }}>
+              UniHub Campus
+            </div>
+            <div style={{ fontSize: 11, color: '#64748b', fontWeight: 500 }}>Operations Hub</div>
           </div>
         </div>
-      </div>
 
-      {/* Right panel — login form */}
-      <div style={{
-        width: 420, display: 'flex', flexDirection: 'column',
-        justifyContent: 'center', padding: '48px 40px',
-        background: '#fff',
-      }}>
-        <div style={{ marginBottom: 32 }}>
-          <h2 style={{ fontFamily: "'Plus Jakarta Sans'", fontSize: 22, fontWeight: 700, letterSpacing: '-0.4px', marginBottom: 6 }}>
-            Sign in
-          </h2>
-          <p style={{ color: '#9ca3af', fontSize: 14 }}>Enter your campus email to continue</p>
-        </div>
+        <h1 style={{ fontSize: 26, fontWeight: 700, color: '#f8fafc', marginBottom: 6, letterSpacing: '-0.5px' }}>
+          Welcome back
+        </h1>
+        <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 32, lineHeight: 1.5 }}>
+          Sign in with your campus email to access resources and bookings.
+        </p>
 
-        <div style={{ marginBottom: 14 }}>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6b7280', marginBottom: 7, textTransform: 'uppercase', letterSpacing: '.07em' }}>
-            Email address
-          </label>
-          <input
-            type="email"
-            className="form-control"
-            placeholder="you@campus.edu"
-            value={email}
-            onChange={e => { setEmail(e.target.value); setError('') }}
-            onKeyDown={e => e.key === 'Enter' && email && doLogin(email)}
-            autoFocus
-          />
-        </div>
+        {/* Email input */}
+        <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#94a3b8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.08em' }}>
+          Email address
+        </label>
+        <input
+          type="email"
+          placeholder="you@campus.edu"
+          value={email}
+          onChange={e => { setEmail(e.target.value); setError('') }}
+          onKeyDown={e => e.key === 'Enter' && email && doLogin(email)}
+          autoFocus
+          style={{
+            width: '100%', padding: '11px 14px', marginBottom: 12,
+            background: '#0f172a', border: '1px solid #334155',
+            borderRadius: 8, color: '#f1f5f9', fontSize: 14, outline: 'none',
+            fontFamily: 'inherit',
+          }}
+          onFocus={e => e.target.style.borderColor = '#0d9488'}
+          onBlur={e => e.target.style.borderColor = '#334155'}
+        />
 
         {error && (
           <div style={{
-            background: '#fef2f2', border: '1px solid #fecaca',
-            borderRadius: 8, padding: '9px 13px', color: '#dc2626',
-            fontSize: 13, marginBottom: 14,
+            background: '#450a0a', border: '1px solid #991b1b',
+            borderRadius: 8, padding: '9px 12px', color: '#fca5a5',
+            fontSize: 13, marginBottom: 12,
           }}>
             {error}
           </div>
@@ -117,47 +112,116 @@ export default function LoginPage() {
         <button
           onClick={() => email && doLogin(email)}
           disabled={loading || !email}
-          className="btn btn-primary"
-          style={{ width: '100%', justifyContent: 'center', padding: '10px', fontSize: 14 }}
+          style={{
+            width: '100%', padding: '11px', borderRadius: 8, border: 'none',
+            background: email && !loading
+              ? 'linear-gradient(135deg, #0d9488, #0891b2)'
+              : '#1e3a5f',
+            color: email && !loading ? '#fff' : '#475569',
+            fontSize: 14, fontWeight: 600, cursor: email && !loading ? 'pointer' : 'not-allowed',
+            fontFamily: 'inherit', transition: 'all .2s',
+          }}
         >
           {loading ? 'Signing in…' : 'Sign In →'}
         </button>
 
-        {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 16px' }}>
-          <div style={{ flex: 1, height: 1, background: '#f3f4f6' }} />
-          <span style={{ fontSize: 11, color: '#d1d5db', fontWeight: 600, letterSpacing: '.06em' }}>DEMO ACCOUNTS</span>
-          <div style={{ flex: 1, height: 1, background: '#f3f4f6' }} />
+        {/* Demo accounts */}
+        <div style={{ marginTop: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ flex: 1, height: 1, background: '#334155' }} />
+            <span style={{ fontSize: 10, color: '#475569', fontWeight: 600, letterSpacing: '.08em' }}>DEMO ACCOUNTS</span>
+            <div style={{ flex: 1, height: 1, background: '#334155' }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {DEMO_ACCOUNTS.map(acc => {
+              const tag = ROLE_TAG[acc.role]
+              return (
+                <button
+                  key={acc.email}
+                  onClick={() => doLogin(acc.email)}
+                  disabled={loading}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '9px 12px', background: '#0f172a',
+                    border: '1px solid #334155', borderRadius: 8,
+                    cursor: 'pointer', fontFamily: 'inherit', transition: 'border-color .15s',
+                  }}
+                  onMouseOver={e => e.currentTarget.style.borderColor = '#0d9488'}
+                  onMouseOut={e => e.currentTarget.style.borderColor = '#334155'}
+                >
+                  <span style={{ fontSize: 13, color: '#cbd5e1' }}>{acc.email}</span>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
+                    background: tag.bg, color: tag.color, textTransform: 'uppercase', letterSpacing: '.06em',
+                  }}>
+                    {acc.role}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
+      </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {DEMO_ACCOUNTS.map(acc => (
-            <button
-              key={acc.email}
-              onClick={() => doLogin(acc.email)}
-              disabled={loading}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '10px 14px', cursor: 'pointer', textAlign: 'left',
-                background: '#fafafa', border: '1px solid #f3f4f6',
-                borderRadius: 9, transition: 'all .15s',
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-              onMouseOver={e => { e.currentTarget.style.borderColor = ROLE_COLOR[acc.role]; e.currentTarget.style.background = '#f9faff' }}
-              onMouseOut={e => { e.currentTarget.style.borderColor = '#f3f4f6'; e.currentTarget.style.background = '#fafafa' }}
-            >
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{acc.email}</div>
-              </div>
-              <span style={{
-                fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 5,
-                background: `${ROLE_COLOR[acc.role]}18`, color: ROLE_COLOR[acc.role],
-                textTransform: 'uppercase', letterSpacing: '.05em',
+      {/* Right: hero panel */}
+      <div style={{
+        flex: 1, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: 56, position: 'relative', overflow: 'hidden',
+        background: 'radial-gradient(ellipse at 30% 50%, #134e4a22 0%, transparent 60%), #0f172a',
+      }}>
+        {/* Grid pattern overlay */}
+        <div style={{
+          position: 'absolute', inset: 0, opacity: 0.04,
+          backgroundImage: 'linear-gradient(#0d9488 1px, transparent 1px), linear-gradient(90deg, #0d9488 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }} />
+
+        {/* Glow orb */}
+        <div style={{
+          position: 'absolute', width: 400, height: 400, borderRadius: '50%',
+          background: 'radial-gradient(circle, #0d948822 0%, transparent 70%)',
+          top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{ position: 'relative', maxWidth: 420, textAlign: 'center' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: '#134e4a', border: '1px solid #0d9488', borderRadius: 20,
+            padding: '5px 14px', marginBottom: 24,
+          }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#0d9488' }} />
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#5eead4', letterSpacing: '.06em' }}>
+              SMART CAMPUS SYSTEM
+            </span>
+          </div>
+
+          <h2 style={{ fontSize: 36, fontWeight: 800, color: '#f8fafc', lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.8px' }}>
+            Manage your campus<br />
+            <span style={{ color: '#2dd4bf' }}>smarter, faster.</span>
+          </h2>
+          <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.7, marginBottom: 40 }}>
+            One unified platform for resource bookings, facility management, and incident handling across your entire university.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'left' }}>
+            {FEATURES.map(({ icon: Icon, text }) => (
+              <div key={text} style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: '#1e293b', border: '1px solid #334155',
+                borderRadius: 10, padding: '12px 16px',
               }}>
-                {acc.role}
-              </span>
-            </button>
-          ))}
+                <div style={{
+                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                  background: '#134e4a', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon size={15} color="#2dd4bf" />
+                </div>
+                <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>{text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
