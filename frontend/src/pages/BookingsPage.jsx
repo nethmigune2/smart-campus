@@ -50,7 +50,7 @@ export default function BookingsPage() {
       axios.get('/api/resources').catch(() => ({ data: [] })),
     ]).then(([bRes, rRes]) => {
       setBookings(bRes.data)
-      setResources(rRes.data.filter(r => r.status === 'ACTIVE'))
+      setResources(rRes.data.filter(r => r.status === 'AVAILABLE'))
     }).finally(() => setLoading(false))
   }
 
