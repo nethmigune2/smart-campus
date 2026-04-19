@@ -48,8 +48,9 @@ public class BookingService {
 
         Resource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
-        if (resource.getStatus() == Resource.ResourceStatus.OUT_OF_SERVICE) {
-            throw new IllegalStateException("Resource is currently out of service");
+        if (resource.getStatus() == Resource.ResourceStatus.MAINTENANCE ||
+                resource.getStatus() == Resource.ResourceStatus.OCCUPIED) {
+            throw new IllegalStateException("Resource is currently unavailable");
         }
 
         List<Booking> conflicts = bookingRepository.findConflicts(resourceId, date, startTime, endTime, null);
