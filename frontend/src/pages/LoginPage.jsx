@@ -1,11 +1,65 @@
-import React from 'react'
-import { GraduationCap, CheckCircle2, Wifi, ShieldCheck } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { GraduationCap, CheckCircle2, Wifi, ShieldCheck, Building2, Zap, Clock } from 'lucide-react'
 
 const FEATURES = [
   { icon: CheckCircle2, text: 'Book lecture halls, labs & equipment instantly' },
   { icon: Wifi,         text: 'Real-time availability & conflict detection' },
   { icon: ShieldCheck,  text: 'Role-based access — Admin, Staff, Student' },
 ]
+
+const STATS = [
+  { id: 'rooms',   icon: Building2, numericTarget: 50, suffix: '+', label: 'Rooms' },
+  { id: 'booking', icon: Zap,       text: 'Real-time',              label: 'Booking' },
+  { id: 'access',  icon: Clock,     text: '24/7',                   label: 'Access' },
+]
+
+function useCountUp(target, duration = 1400) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (typeof target !== 'number') return
+    let startTime = null
+    const step = (ts) => {
+      if (!startTime) startTime = ts
+      const progress = Math.min((ts - startTime) / duration, 1)
+      setCount(Math.floor(progress * target))
+      if (progress < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }, [target, duration])
+  return count
+}
+
+function StatTile({ stat, delay }) {
+  const [visible, setVisible] = useState(false)
+  const count = useCountUp(stat.numericTarget ?? 0)
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), delay)
+    return () => clearTimeout(t)
+  }, [delay])
+
+  const display = stat.numericTarget != null
+    ? `${count}${stat.suffix ?? ''}`
+    : stat.text
+
+  return (
+    <div style={{
+      flex: 1, textAlign: 'center', padding: '14px 10px',
+      background: '#0f172a', border: '1px solid #334155', borderRadius: 10,
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(8px)',
+      transition: `opacity 0.5s ${delay}ms, transform 0.5s ${delay}ms`,
+    }}>
+      <stat.icon size={16} color="#2dd4bf" style={{ marginBottom: 6, display: 'block', margin: '0 auto 6px' }} />
+      <div style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.4px', lineHeight: 1 }}>
+        {display}
+      </div>
+      <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, marginTop: 3, textTransform: 'uppercase', letterSpacing: '.06em' }}>
+        {stat.label}
+      </div>
+    </div>
+  )
+}
 
 export default function LoginPage() {
   const handleGoogleLogin = () => {
@@ -18,21 +72,21 @@ export default function LoginPage() {
       background: '#0f172a',
       fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     }}>
-      {/* Left: sign-in panel */}
+      {/* ── Left: sign-in panel ── */}
       <div style={{
-        width: 460, display: 'flex', flexDirection: 'column',
+        width: 480, display: 'flex', flexDirection: 'column',
         justifyContent: 'center', padding: '56px 48px',
-        background: '#1e293b',
-        borderRight: '1px solid #334155',
+        background: '#1e293b', borderRight: '1px solid #334155',
       }}>
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 40 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 36 }}>
           <div style={{
-            width: 38, height: 38, borderRadius: 10,
+            width: 40, height: 40, borderRadius: 11,
             background: 'linear-gradient(135deg, #0d9488, #0891b2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(13,148,136,0.4)',
           }}>
-            <GraduationCap size={20} color="#fff" />
+            <GraduationCap size={21} color="#fff" />
           </div>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.3px' }}>
@@ -42,51 +96,69 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <h1 style={{ fontSize: 26, fontWeight: 700, color: '#f8fafc', marginBottom: 6, letterSpacing: '-0.5px' }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f8fafc', marginBottom: 4, letterSpacing: '-0.6px' }}>
           Welcome back
         </h1>
-        <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 40, lineHeight: 1.6 }}>
-          Sign in with your Google account to access campus resources, bookings, and more.
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#2dd4bf', marginBottom: 10, letterSpacing: '0.01em' }}>
+          Your university. Simplified.
+        </p>
+        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 32, lineHeight: 1.7 }}>
+          Sign in with your university Google account to access campus resources, bookings, and more.
         </p>
 
-        {/* Google sign-in button */}
+        {/* Animated stats */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 36 }}>
+          {STATS.map((s, i) => <StatTile key={s.id} stat={s} delay={i * 150} />)}
+        </div>
+
+        {/* Google button — prominent */}
         <button
           onClick={handleGoogleLogin}
           style={{
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 12, padding: '13px 20px', borderRadius: 10,
-            background: '#fff', border: '1px solid #e2e8f0',
-            cursor: 'pointer', fontFamily: 'inherit',
-            fontSize: 15, fontWeight: 600, color: '#1e293b',
-            transition: 'all .18s',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+            gap: 12, padding: '15px 20px', borderRadius: 11,
+            background: 'linear-gradient(135deg, #0d9488 0%, #0891b2 100%)',
+            border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+            fontSize: 15, fontWeight: 700, color: '#fff',
+            transition: 'all .2s',
+            boxShadow: '0 4px 16px rgba(13,148,136,0.45)',
           }}
           onMouseOver={e => {
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
-            e.currentTarget.style.transform = 'translateY(-1px)'
+            e.currentTarget.style.transform = 'translateY(-2px)'
+            e.currentTarget.style.boxShadow = '0 8px 24px rgba(13,148,136,0.55)'
           }}
           onMouseOut={e => {
-            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)'
             e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(13,148,136,0.45)'
           }}
         >
-          {/* Google SVG icon */}
-          <svg width="20" height="20" viewBox="0 0 48 48">
-            <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.62 3.1 29.6 1 24 1 14.82 1 6.96 6.48 3.28 14.34l7.08 5.5C12.18 13.56 17.6 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.52 24.5c0-1.64-.15-3.22-.42-4.74H24v9h12.72c-.55 2.94-2.2 5.44-4.7 7.12l7.22 5.6C43.28 37.58 46.52 31.5 46.52 24.5z"/>
-            <path fill="#FBBC05" d="M10.36 28.16A14.44 14.44 0 0 1 9.5 24c0-1.44.25-2.84.68-4.16l-7.08-5.5A23.94 23.94 0 0 0 0 24c0 3.86.92 7.5 2.54 10.72l7.82-6.56z"/>
-            <path fill="#34A853" d="M24 47c5.52 0 10.16-1.82 13.54-4.96l-7.22-5.6c-1.84 1.24-4.2 1.96-6.32 1.96-6.38 0-11.8-4.06-13.64-9.78l-7.82 6.56C6.92 41.48 14.82 47 24 47z"/>
-            <path fill="none" d="M0 0h48v48H0z"/>
-          </svg>
-          Sign in with Google
+          <div style={{
+            width: 30, height: 30, borderRadius: 7, background: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}>
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.62 3.1 29.6 1 24 1 14.82 1 6.96 6.48 3.28 14.34l7.08 5.5C12.18 13.56 17.6 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.52 24.5c0-1.64-.15-3.22-.42-4.74H24v9h12.72c-.55 2.94-2.2 5.44-4.7 7.12l7.22 5.6C43.28 37.58 46.52 31.5 46.52 24.5z"/>
+              <path fill="#FBBC05" d="M10.36 28.16A14.44 14.44 0 0 1 9.5 24c0-1.44.25-2.84.68-4.16l-7.08-5.5A23.94 23.94 0 0 0 0 24c0 3.86.92 7.5 2.54 10.72l7.82-6.56z"/>
+              <path fill="#34A853" d="M24 47c5.52 0 10.16-1.82 13.54-4.96l-7.22-5.6c-1.84 1.24-4.2 1.96-6.32 1.96-6.38 0-11.8-4.06-13.64-9.78l-7.82 6.56C6.92 41.48 14.82 47 24 47z"/>
+              <path fill="none" d="M0 0h48v48H0z"/>
+            </svg>
+          </div>
+          Continue with Google
         </button>
 
-        <p style={{ marginTop: 24, fontSize: 12, color: '#475569', textAlign: 'center', lineHeight: 1.6 }}>
+        <div style={{ margin: '18px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ flex: 1, height: 1, background: '#334155' }} />
+          <span style={{ fontSize: 11, color: '#475569', fontWeight: 500 }}>University SSO</span>
+          <div style={{ flex: 1, height: 1, background: '#334155' }} />
+        </div>
+
+        <p style={{ fontSize: 12, color: '#475569', textAlign: 'center', lineHeight: 1.6 }}>
           By signing in you agree to use this platform for authorised campus activities only.
         </p>
       </div>
 
-      {/* Right: hero panel */}
+      {/* ── Right: hero panel ── */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -99,11 +171,10 @@ export default function LoginPage() {
           backgroundImage: 'linear-gradient(#0d9488 1px, transparent 1px), linear-gradient(90deg, #0d9488 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }} />
-
         {/* Glow orb */}
         <div style={{
-          position: 'absolute', width: 400, height: 400, borderRadius: '50%',
-          background: 'radial-gradient(circle, #0d948822 0%, transparent 70%)',
+          position: 'absolute', width: 440, height: 440, borderRadius: '50%',
+          background: 'radial-gradient(circle, #0d948826 0%, transparent 70%)',
           top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
           pointerEvents: 'none',
         }} />
@@ -120,26 +191,36 @@ export default function LoginPage() {
             </span>
           </div>
 
-          <h2 style={{ fontSize: 36, fontWeight: 800, color: '#f8fafc', lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.8px' }}>
+          <h2 style={{ fontSize: 38, fontWeight: 800, color: '#f8fafc', lineHeight: 1.15, marginBottom: 16, letterSpacing: '-0.9px' }}>
             Manage your campus<br />
             <span style={{ color: '#2dd4bf' }}>smarter, faster.</span>
           </h2>
-          <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.7, marginBottom: 40 }}>
+          <p style={{ fontSize: 15, color: '#64748b', lineHeight: 1.75, marginBottom: 40 }}>
             One unified platform for resource bookings, facility management, and incident handling across your entire university.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'left' }}>
             {FEATURES.map(({ icon: Icon, text }) => (
               <div key={text} style={{
-                display: 'flex', alignItems: 'center', gap: 12,
+                display: 'flex', alignItems: 'center', gap: 14,
                 background: '#1e293b', border: '1px solid #334155',
-                borderRadius: 10, padding: '12px 16px',
-              }}>
+                borderRadius: 10, padding: '13px 16px',
+                transition: 'border-color .2s, transform .2s',
+              }}
+                onMouseOver={e => {
+                  e.currentTarget.style.borderColor = '#0d9488'
+                  e.currentTarget.style.transform = 'translateX(4px)'
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.borderColor = '#334155'
+                  e.currentTarget.style.transform = 'translateX(0)'
+                }}
+              >
                 <div style={{
-                  width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                  width: 34, height: 34, borderRadius: 8, flexShrink: 0,
                   background: '#134e4a', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <Icon size={15} color="#2dd4bf" />
+                  <Icon size={16} color="#2dd4bf" />
                 </div>
                 <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>{text}</span>
               </div>
