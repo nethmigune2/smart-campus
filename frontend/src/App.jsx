@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Navbar from './components/NavBar'
 import LoginPage from './pages/LoginPage'
+import AuthCallback from './pages/AuthCallback'
 import Dashboard from './pages/Dashboard'
 import ResourcesPage from './pages/ResourcesPage'
 import BookingsPage from './pages/BookingsPage'
@@ -42,8 +43,8 @@ function PlaceholderPage({ title, desc }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <Toaster
           position="top-right"
           toastOptions={{
@@ -52,10 +53,11 @@ export default function App() {
           }}
         />
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/*"     element={<AppLayout />} />
+          <Route path="/login"         element={<LoginPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/*"             element={<AppLayout />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }

@@ -1,21 +1,5 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { GraduationCap, CheckCircle2, Wifi, ShieldCheck } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import axios from 'axios'
-
-const DEMO_ACCOUNTS = [
-  { label: 'Admin',   email: 'admin@campus.edu',  role: 'ADMIN'   },
-  { label: 'Staff',   email: 'bob@campus.edu',     role: 'STAFF'   },
-  { label: 'Student', email: 'alice@campus.edu',   role: 'STUDENT' },
-  { label: 'Student', email: 'carol@campus.edu',   role: 'STUDENT' },
-]
-
-const ROLE_TAG = {
-  ADMIN:   { bg: '#134e4a', color: '#5eead4' },
-  STAFF:   { bg: '#1e3a5f', color: '#7dd3fc' },
-  STUDENT: { bg: '#3b1f5e', color: '#c4b5fd' },
-}
 
 const FEATURES = [
   { icon: CheckCircle2, text: 'Book lecture halls, labs & equipment instantly' },
@@ -24,21 +8,8 @@ const FEATURES = [
 ]
 
 export default function LoginPage() {
-  const { login }  = useAuth()
-  const navigate   = useNavigate()
-  const [email,    setEmail]   = useState('')
-  const [error,    setError]   = useState('')
-  const [loading,  setLoading] = useState(false)
-
-  const doLogin = async (emailVal) => {
-    setError(''); setLoading(true)
-    try {
-      const res = await axios.post('/api/auth/login', { email: emailVal })
-      login(res.data)
-      navigate('/dashboard')
-    } catch (err) {
-      setError(err.response?.data?.message || 'No account found with that email.')
-    } finally { setLoading(false) }
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google'
   }
 
   return (
@@ -47,7 +18,7 @@ export default function LoginPage() {
       background: '#0f172a',
       fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     }}>
-      {/* Left: form panel */}
+      {/* Left: sign-in panel */}
       <div style={{
         width: 460, display: 'flex', flexDirection: 'column',
         justifyContent: 'center', padding: '56px 48px',
@@ -74,93 +45,45 @@ export default function LoginPage() {
         <h1 style={{ fontSize: 26, fontWeight: 700, color: '#f8fafc', marginBottom: 6, letterSpacing: '-0.5px' }}>
           Welcome back
         </h1>
-        <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 32, lineHeight: 1.5 }}>
-          Sign in with your campus email to access resources and bookings.
+        <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 40, lineHeight: 1.6 }}>
+          Sign in with your Google account to access campus resources, bookings, and more.
         </p>
 
-        {/* Email input */}
-        <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#94a3b8', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.08em' }}>
-          Email address
-        </label>
-        <input
-          type="email"
-          placeholder="you@campus.edu"
-          value={email}
-          onChange={e => { setEmail(e.target.value); setError('') }}
-          onKeyDown={e => e.key === 'Enter' && email && doLogin(email)}
-          autoFocus
-          style={{
-            width: '100%', padding: '11px 14px', marginBottom: 12,
-            background: '#0f172a', border: '1px solid #334155',
-            borderRadius: 8, color: '#f1f5f9', fontSize: 14, outline: 'none',
-            fontFamily: 'inherit',
-          }}
-          onFocus={e => e.target.style.borderColor = '#0d9488'}
-          onBlur={e => e.target.style.borderColor = '#334155'}
-        />
-
-        {error && (
-          <div style={{
-            background: '#450a0a', border: '1px solid #991b1b',
-            borderRadius: 8, padding: '9px 12px', color: '#fca5a5',
-            fontSize: 13, marginBottom: 12,
-          }}>
-            {error}
-          </div>
-        )}
-
+        {/* Google sign-in button */}
         <button
-          onClick={() => email && doLogin(email)}
-          disabled={loading || !email}
+          onClick={handleGoogleLogin}
           style={{
-            width: '100%', padding: '11px', borderRadius: 8, border: 'none',
-            background: email && !loading
-              ? 'linear-gradient(135deg, #0d9488, #0891b2)'
-              : '#1e3a5f',
-            color: email && !loading ? '#fff' : '#475569',
-            fontSize: 14, fontWeight: 600, cursor: email && !loading ? 'pointer' : 'not-allowed',
-            fontFamily: 'inherit', transition: 'all .2s',
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 12, padding: '13px 20px', borderRadius: 10,
+            background: '#fff', border: '1px solid #e2e8f0',
+            cursor: 'pointer', fontFamily: 'inherit',
+            fontSize: 15, fontWeight: 600, color: '#1e293b',
+            transition: 'all .18s',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          }}
+          onMouseOver={e => {
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
+            e.currentTarget.style.transform = 'translateY(-1px)'
+          }}
+          onMouseOut={e => {
+            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)'
+            e.currentTarget.style.transform = 'translateY(0)'
           }}
         >
-          {loading ? 'Signing in…' : 'Sign In →'}
+          {/* Google SVG icon */}
+          <svg width="20" height="20" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.08-6.08C34.62 3.1 29.6 1 24 1 14.82 1 6.96 6.48 3.28 14.34l7.08 5.5C12.18 13.56 17.6 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.52 24.5c0-1.64-.15-3.22-.42-4.74H24v9h12.72c-.55 2.94-2.2 5.44-4.7 7.12l7.22 5.6C43.28 37.58 46.52 31.5 46.52 24.5z"/>
+            <path fill="#FBBC05" d="M10.36 28.16A14.44 14.44 0 0 1 9.5 24c0-1.44.25-2.84.68-4.16l-7.08-5.5A23.94 23.94 0 0 0 0 24c0 3.86.92 7.5 2.54 10.72l7.82-6.56z"/>
+            <path fill="#34A853" d="M24 47c5.52 0 10.16-1.82 13.54-4.96l-7.22-5.6c-1.84 1.24-4.2 1.96-6.32 1.96-6.38 0-11.8-4.06-13.64-9.78l-7.82 6.56C6.92 41.48 14.82 47 24 47z"/>
+            <path fill="none" d="M0 0h48v48H0z"/>
+          </svg>
+          Sign in with Google
         </button>
 
-        {/* Demo accounts */}
-        <div style={{ marginTop: 28 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ flex: 1, height: 1, background: '#334155' }} />
-            <span style={{ fontSize: 10, color: '#475569', fontWeight: 600, letterSpacing: '.08em' }}>DEMO ACCOUNTS</span>
-            <div style={{ flex: 1, height: 1, background: '#334155' }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {DEMO_ACCOUNTS.map(acc => {
-              const tag = ROLE_TAG[acc.role]
-              return (
-                <button
-                  key={acc.email}
-                  onClick={() => doLogin(acc.email)}
-                  disabled={loading}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '9px 12px', background: '#0f172a',
-                    border: '1px solid #334155', borderRadius: 8,
-                    cursor: 'pointer', fontFamily: 'inherit', transition: 'border-color .15s',
-                  }}
-                  onMouseOver={e => e.currentTarget.style.borderColor = '#0d9488'}
-                  onMouseOut={e => e.currentTarget.style.borderColor = '#334155'}
-                >
-                  <span style={{ fontSize: 13, color: '#cbd5e1' }}>{acc.email}</span>
-                  <span style={{
-                    fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
-                    background: tag.bg, color: tag.color, textTransform: 'uppercase', letterSpacing: '.06em',
-                  }}>
-                    {acc.role}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
+        <p style={{ marginTop: 24, fontSize: 12, color: '#475569', textAlign: 'center', lineHeight: 1.6 }}>
+          By signing in you agree to use this platform for authorised campus activities only.
+        </p>
       </div>
 
       {/* Right: hero panel */}
@@ -170,7 +93,7 @@ export default function LoginPage() {
         padding: 56, position: 'relative', overflow: 'hidden',
         background: 'radial-gradient(ellipse at 30% 50%, #134e4a22 0%, transparent 60%), #0f172a',
       }}>
-        {/* Grid pattern overlay */}
+        {/* Grid overlay */}
         <div style={{
           position: 'absolute', inset: 0, opacity: 0.04,
           backgroundImage: 'linear-gradient(#0d9488 1px, transparent 1px), linear-gradient(90deg, #0d9488 1px, transparent 1px)',

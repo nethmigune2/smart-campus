@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-const TYPES = ['ALL', 'LECTURE_HALL', 'LAB', 'MEETING_ROOM', 'EQUIPMENT']
-const STATUSES = ['ALL', 'ACTIVE', 'OUT_OF_SERVICE']
+const TYPES = ['ALL', 'AUDITORIUM', 'LAB', 'LECTURE_HALL', 'MEETING_ROOM']
+const STATUSES = ['ALL', 'AVAILABLE', 'MAINTENANCE', 'OCCUPIED']
 
 const S = {
   page:   { padding: '32px 36px', background: '#0f172a', minHeight: '100vh', fontFamily: "'Inter','Plus Jakarta Sans',sans-serif" },
@@ -20,10 +20,16 @@ const S = {
   badge: (c, bg) => ({ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4, color: c, background: bg, textTransform: 'uppercase', letterSpacing: '.05em' }),
 }
 
-const TYPE_LABEL = { LECTURE_HALL: 'Lecture Hall', LAB: 'Lab', MEETING_ROOM: 'Meeting Room', EQUIPMENT: 'Equipment' }
-const TYPE_COLOR = { LECTURE_HALL: ['#7dd3fc','#1e3a5f'], LAB: ['#a5f3fc','#164e63'], MEETING_ROOM: ['#c4b5fd','#3b1f5e'], EQUIPMENT: ['#fde68a','#451a03'] }
+const TYPE_LABEL = { AUDITORIUM: 'Auditorium', LAB: 'Lab', LECTURE_HALL: 'Lecture Hall', MEETING_ROOM: 'Meeting Room' }
+const TYPE_COLOR = { AUDITORIUM: ['#fca5a5','#450a0a'], LAB: ['#a5f3fc','#164e63'], LECTURE_HALL: ['#7dd3fc','#1e3a5f'], MEETING_ROOM: ['#c4b5fd','#3b1f5e'] }
 
-const EMPTY_FORM = { name: '', type: 'LECTURE_HALL', capacity: '', location: '', description: '', availabilityStart: '08:00', availabilityEnd: '18:00', status: 'ACTIVE' }
+const STATUS_BADGE = {
+  AVAILABLE:   { color: '#34d399', bg: '#064e3b', label: 'Available' },
+  MAINTENANCE: { color: '#fbbf24', bg: '#451a03', label: 'Maintenance' },
+  OCCUPIED:    { color: '#f87171', bg: '#450a0a', label: 'Occupied' },
+}
+
+const EMPTY_FORM = { name: '', type: 'LECTURE_HALL', capacity: '', location: '', description: '', availabilityStart: '08:00', availabilityEnd: '18:00', status: 'AVAILABLE' }
 
 export default function ResourcesPage() {
   const { user } = useAuth()
@@ -146,8 +152,8 @@ export default function ResourcesPage() {
               <div key={r.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={S.badge(tc, tbg)}>{TYPE_LABEL[r.type] || r.type}</span>
-                  <span style={r.status === 'ACTIVE' ? S.badge('#34d399','#064e3b') : S.badge('#94a3b8','#1e293b')}>
-                    {r.status === 'ACTIVE' ? 'Active' : 'Out of Service'}
+                  <span style={S.badge(STATUS_BADGE[r.status]?.color ?? '#94a3b8', STATUS_BADGE[r.status]?.bg ?? '#1e293b')}>
+                    {STATUS_BADGE[r.status]?.label ?? r.status}
                   </span>
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9' }}>{r.name}</div>
@@ -229,8 +235,9 @@ export default function ResourcesPage() {
               <div style={{ gridColumn: 'span 2' }}>
                 <label style={S.label}>Status</label>
                 <select style={S.select} value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
-                  <option value="ACTIVE">Active</option>
-                  <option value="OUT_OF_SERVICE">Out of Service</option>
+                  <option value="AVAILABLE">Available</option>
+                  <option value="MAINTENANCE">Maintenance</option>
+                  <option value="OCCUPIED">Occupied</option>
                 </select>
               </div>
             </div>

@@ -58,9 +58,9 @@ public class Resource {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "`status`", nullable = false)
     @Builder.Default
-    private ResourceStatus status = ResourceStatus.ACTIVE;
+    private ResourceStatus status = ResourceStatus.AVAILABLE;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -71,10 +71,10 @@ public class Resource {
     }
 
     public enum ResourceType {
-        LECTURE_HALL, LAB, MEETING_ROOM, EQUIPMENT
+        AUDITORIUM, LAB, LECTURE_HALL, MEETING_ROOM
     }
 
     public enum ResourceStatus {
-        ACTIVE, OUT_OF_SERVICE
+        AVAILABLE, MAINTENANCE, OCCUPIED
     }
 }
