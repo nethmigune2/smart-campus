@@ -71,7 +71,7 @@ public class Resource {
     }
 
     public enum ResourceType {
-        AUDITORIUM, LAB, LECTURE_HALL, MEETING_ROOM
+        AUDITORIUM, LAB, LECTURE_HALL, MEETING_ROOM, EQUIPMENT
     }
 
     public enum ResourceStatus {

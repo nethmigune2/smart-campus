@@ -1,11 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Booking;
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +21,13 @@ import java.util.Map;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final UserRepository userRepository;
+
+    private User getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -26,12 +36,21 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(bookingService.getById(id));
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        Booking booking = bookingService.getById(id);
+        User current = getCurrentUser();
+        if (current.getRole() != User.Role.ADMIN && !current.getId().equals(booking.getUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
+        }
+        return ResponseEntity.ok(booking);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Booking>> getByUser(@PathVariable Long userId) {
+    public ResponseEntity<?> getByUser(@PathVariable Long userId) {
+        User current = getCurrentUser();
+        if (current.getRole() != User.Role.ADMIN && !current.getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
+        }
         return ResponseEntity.ok(bookingService.getByUser(userId));
     }
 
@@ -55,7 +74,12 @@ public class BookingController {
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Booking> cancel(@PathVariable Long id) {
+    public ResponseEntity<?> cancel(@PathVariable Long id) {
+        Booking booking = bookingService.getById(id);
+        User current = getCurrentUser();
+        if (current.getRole() != User.Role.ADMIN && !current.getId().equals(booking.getUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "You can only cancel your own bookings"));
+        }
         return ResponseEntity.ok(bookingService.cancel(id));
     }
 

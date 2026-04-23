@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-const TYPES = ['ALL', 'AUDITORIUM', 'LAB', 'LECTURE_HALL', 'MEETING_ROOM']
+const TYPES = ['ALL', 'AUDITORIUM', 'LAB', 'LECTURE_HALL', 'MEETING_ROOM', 'EQUIPMENT']
 const STATUSES = ['ALL', 'AVAILABLE', 'MAINTENANCE', 'OCCUPIED']
 
 const S = {
@@ -20,8 +20,8 @@ const S = {
   badge: (c, bg) => ({ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4, color: c, background: bg, textTransform: 'uppercase', letterSpacing: '.05em' }),
 }
 
-const TYPE_LABEL = { AUDITORIUM: 'Auditorium', LAB: 'Lab', LECTURE_HALL: 'Lecture Hall', MEETING_ROOM: 'Meeting Room' }
-const TYPE_COLOR = { AUDITORIUM: ['#fca5a5','#450a0a'], LAB: ['#a5f3fc','#164e63'], LECTURE_HALL: ['#7dd3fc','#1e3a5f'], MEETING_ROOM: ['#c4b5fd','#3b1f5e'] }
+const TYPE_LABEL = { AUDITORIUM: 'Auditorium', LAB: 'Lab', LECTURE_HALL: 'Lecture Hall', MEETING_ROOM: 'Meeting Room', EQUIPMENT: 'Equipment' }
+const TYPE_COLOR = { AUDITORIUM: ['#fca5a5','#450a0a'], LAB: ['#a5f3fc','#164e63'], LECTURE_HALL: ['#7dd3fc','#1e3a5f'], MEETING_ROOM: ['#c4b5fd','#3b1f5e'], EQUIPMENT: ['#fdba74','#431407'] }
 
 const STATUS_BADGE = {
   AVAILABLE:   { color: '#34d399', bg: '#064e3b', label: 'Available' },

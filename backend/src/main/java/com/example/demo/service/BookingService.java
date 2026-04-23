@@ -96,8 +96,9 @@ public class BookingService {
 
     public Booking cancel(Long id) {
         Booking booking = getById(id);
-        if (booking.getStatus() != Booking.BookingStatus.APPROVED) {
-            throw new IllegalStateException("Only APPROVED bookings can be cancelled");
+        if (booking.getStatus() != Booking.BookingStatus.APPROVED &&
+                booking.getStatus() != Booking.BookingStatus.PENDING) {
+            throw new IllegalStateException("Only PENDING or APPROVED bookings can be cancelled");
         }
         booking.setStatus(Booking.BookingStatus.CANCELLED);
         return bookingRepository.save(booking);

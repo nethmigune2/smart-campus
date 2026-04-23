@@ -32,15 +32,19 @@ export default function BookingsPage() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
 
-  const [bookings,   setBookings]   = useState([])
-  const [resources,  setResources]  = useState([])
-  const [loading,    setLoading]    = useState(true)
-  const [statusFilter, setStatusFilter] = useState('ALL')
-  const [showModal,  setShowModal]  = useState(false)
-  const [form,       setForm]       = useState(EMPTY_FORM)
-  const [saving,     setSaving]     = useState(false)
-  const [rejectModal, setRejectModal] = useState(null)
-  const [rejectReason, setRejectReason] = useState('')
+  const [bookings,      setBookings]      = useState([])
+  const [resources,     setResources]     = useState([])
+  const [allResources,  setAllResources]  = useState([])
+  const [loading,       setLoading]       = useState(true)
+  const [statusFilter,  setStatusFilter]  = useState('ALL')
+  const [resourceFilter, setResourceFilter] = useState('ALL')
+  const [dateFrom,      setDateFrom]      = useState('')
+  const [dateTo,        setDateTo]        = useState('')
+  const [showModal,     setShowModal]     = useState(false)
+  const [form,          setForm]          = useState(EMPTY_FORM)
+  const [saving,        setSaving]        = useState(false)
+  const [rejectModal,   setRejectModal]   = useState(null)
+  const [rejectReason,  setRejectReason]  = useState('')
 
   const load = () => {
     setLoading(true)
@@ -50,15 +54,20 @@ export default function BookingsPage() {
       axios.get('/api/resources').catch(() => ({ data: [] })),
     ]).then(([bRes, rRes]) => {
       setBookings(bRes.data)
+      setAllResources(rRes.data)
       setResources(rRes.data.filter(r => r.status === 'AVAILABLE'))
     }).finally(() => setLoading(false))
   }
 
   useEffect(() => { if (user?.id) load() }, [user])
 
-  const filtered = statusFilter === 'ALL'
-    ? bookings
-    : bookings.filter(b => b.status === statusFilter)
+  const filtered = bookings.filter(b => {
+    if (statusFilter !== 'ALL' && b.status !== statusFilter) return false
+    if (resourceFilter !== 'ALL' && String(b.resource?.id) !== resourceFilter) return false
+    if (dateFrom && b.date < dateFrom) return false
+    if (dateTo && b.date > dateTo) return false
+    return true
+  })
 
   const openCreate = () => { setForm(EMPTY_FORM); setShowModal(true) }
   const closeModal = () => { setShowModal(false); setForm(EMPTY_FORM) }
@@ -114,23 +123,56 @@ export default function BookingsPage() {
       </div>
 
       {/* Filter bar */}
-      <div style={{ ...S.card, marginBottom: 20, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <Filter size={13} color="#64748b" />
-        <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginRight: 4 }}>STATUS:</span>
-        {['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'].map(s => (
-          <button
-            key={s}
-            onClick={() => setStatusFilter(s)}
-            style={{
-              padding: '5px 12px', borderRadius: 6, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              fontSize: 11, fontWeight: 600,
-              background: statusFilter === s ? '#0d9488' : '#0f172a',
-              color: statusFilter === s ? '#fff' : '#64748b',
-            }}
-          >
-            {s}
-          </button>
-        ))}
+      <div style={{ ...S.card, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Status filter */}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <Filter size={13} color="#64748b" />
+          <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginRight: 4 }}>STATUS:</span>
+          {['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'].map(s => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              style={{
+                padding: '5px 12px', borderRadius: 6, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                fontSize: 11, fontWeight: 600,
+                background: statusFilter === s ? '#0d9488' : '#0f172a',
+                color: statusFilter === s ? '#fff' : '#64748b',
+              }}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+        {/* Admin-only: resource + date range filters */}
+        {isAdmin && (
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            <div style={{ minWidth: 200 }}>
+              <label style={S.label}>Resource</label>
+              <select style={S.select} value={resourceFilter} onChange={e => setResourceFilter(e.target.value)}>
+                <option value="ALL">All Resources</option>
+                {allResources.map(r => (
+                  <option key={r.id} value={String(r.id)}>{r.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={S.label}>From Date</label>
+              <input style={{ ...S.input, width: 150 }} type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
+            </div>
+            <div>
+              <label style={S.label}>To Date</label>
+              <input style={{ ...S.input, width: 150 }} type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} />
+            </div>
+            {(resourceFilter !== 'ALL' || dateFrom || dateTo) && (
+              <button
+                style={{ ...S.btnGhost, alignSelf: 'flex-end' }}
+                onClick={() => { setResourceFilter('ALL'); setDateFrom(''); setDateTo('') }}
+              >
+                <X size={12} /> Clear
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -210,6 +252,17 @@ export default function BookingsPage() {
                           </button>
                         </>
                       )}
+                      {!isAdmin && b.status === 'PENDING' && (
+                        <>
+                          <span style={{ fontSize: 11, color: '#fbbf24' }}>Awaiting review</span>
+                          <button
+                            style={{ ...S.btnGhost, color: '#f87171', borderColor: '#450a0a' }}
+                            onClick={() => handleCancel(b.id)} title="Cancel request"
+                          >
+                            <Ban size={13} /> Cancel
+                          </button>
+                        </>
+                      )}
                       {!isAdmin && b.status === 'APPROVED' && (
                         <button
                           style={{ ...S.btnGhost, color: '#f87171', borderColor: '#450a0a' }}
@@ -217,9 +270,6 @@ export default function BookingsPage() {
                         >
                           <Ban size={13} /> Cancel
                         </button>
-                      )}
-                      {b.status === 'PENDING' && !isAdmin && (
-                        <span style={{ fontSize: 11, color: '#fbbf24' }}>Awaiting review</span>
                       )}
                     </div>
                   </td>
