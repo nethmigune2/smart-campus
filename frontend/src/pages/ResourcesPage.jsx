@@ -4,6 +4,15 @@ import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
+const formatTime = (t) => {
+  if (!t) return ''
+  const [h, m] = t.split(':')
+  const hour = parseInt(h, 10)
+  const ampm = hour >= 12 ? 'PM' : 'AM'
+  const h12 = hour % 12 || 12
+  return `${String(h12).padStart(2, '0')}.${m} ${ampm}`
+}
+
 const TYPES = ['ALL', 'AUDITORIUM', 'LAB', 'LECTURE_HALL', 'MEETING_ROOM', 'EQUIPMENT']
 const STATUSES = ['ALL', 'AVAILABLE', 'MAINTENANCE', 'OCCUPIED']
 
@@ -169,7 +178,7 @@ export default function ResourcesPage() {
                   )}
                   {r.availabilityStart && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#94a3b8' }}>
-                      <Clock size={12} color="#64748b" /> {r.availabilityStart} – {r.availabilityEnd}
+                      <Clock size={12} color="#64748b" /> {formatTime(r.availabilityStart)} – {formatTime(r.availabilityEnd)}
                     </div>
                   )}
                 </div>

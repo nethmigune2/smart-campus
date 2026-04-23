@@ -4,6 +4,15 @@ import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
+const formatTime = (t) => {
+  if (!t) return ''
+  const [h, m] = t.split(':')
+  const hour = parseInt(h, 10)
+  const ampm = hour >= 12 ? 'PM' : 'AM'
+  const h12 = hour % 12 || 12
+  return `${String(h12).padStart(2, '0')}.${m} ${ampm}`
+}
+
 const S = {
   page:   { padding: '32px 36px', background: '#0f172a', minHeight: '100vh', fontFamily: "'Inter','Plus Jakarta Sans',sans-serif" },
   heading: { fontSize: 22, fontWeight: 700, color: '#f8fafc', marginBottom: 4, letterSpacing: '-0.4px' },
@@ -217,7 +226,7 @@ export default function BookingsPage() {
                   <td style={{ ...S.td, whiteSpace: 'nowrap' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                       <Clock size={12} color="#64748b" />
-                      {b.startTime} – {b.endTime}
+                      {formatTime(b.startTime)} – {formatTime(b.endTime)}
                     </div>
                   </td>
                   <td style={{ ...S.td, maxWidth: 180 }}>
