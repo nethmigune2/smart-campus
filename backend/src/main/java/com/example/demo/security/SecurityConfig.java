@@ -59,6 +59,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/resources/**").authenticated()
                 // All booking endpoints require authentication
                 .requestMatchers("/api/bookings/**").authenticated()
+                // Ticket file serving is public; everything else requires authentication
+                .requestMatchers(HttpMethod.GET, "/api/tickets/files/**").permitAll()
+                .requestMatchers("/api/tickets/**").authenticated()
+                .requestMatchers("/api/notifications/**").authenticated()
                 .anyRequest().authenticated()
             );
 

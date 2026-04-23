@@ -9,6 +9,8 @@ import Dashboard from './pages/Dashboard'
 import ResourcesPage from './pages/ResourcesPage'
 import BookingsPage from './pages/BookingsPage'
 import AdminPage from './pages/AdminPage'
+import TicketsPage from './pages/TicketsPage'
+import NotificationsPage from './pages/NotificationsPage'
 
 function RequireRole({ roles, children }) {
   const { user } = useAuth()
@@ -29,8 +31,8 @@ function AppLayout() {
           <Route path="/dashboard"     element={<Dashboard />} />
           <Route path="/resources"     element={<ResourcesPage />} />
           <Route path="/bookings"      element={<BookingsPage />} />
-          <Route path="/tickets"       element={<PlaceholderPage title="Maintenance Tickets" desc="Incident ticketing module — coming soon." />} />
-          <Route path="/notifications" element={<PlaceholderPage title="Alerts & Notifications" desc="Notification centre — coming soon." />} />
+          <Route path="/tickets"       element={<TicketsPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/admin"         element={
             <RequireRole roles={['ADMIN']}>
               <AdminPage />

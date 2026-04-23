@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Booking;
+import com.example.demo.model.Notification;
 import com.example.demo.model.Resource;
 import com.example.demo.model.User;
 import com.example.demo.repository.BookingRepository;
@@ -21,6 +22,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public List<Booking> getAll() {
         return bookingRepository.findAll();
@@ -81,7 +83,15 @@ public class BookingService {
             throw new IllegalStateException("Only PENDING bookings can be approved");
         }
         booking.setStatus(Booking.BookingStatus.APPROVED);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        notificationService.send(
+            booking.getUser(),
+            "Booking Approved",
+            "Your booking for \"" + booking.getResource().getName() + "\" on " + booking.getDate() + " has been approved.",
+            Notification.NotificationType.BOOKING_APPROVED,
+            booking.getId()
+        );
+        return saved;
     }
 
     public Booking reject(Long id, String reason) {
@@ -91,7 +101,15 @@ public class BookingService {
         }
         booking.setStatus(Booking.BookingStatus.REJECTED);
         booking.setRejectionReason(reason);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        notificationService.send(
+            booking.getUser(),
+            "Booking Rejected",
+            "Your booking for \"" + booking.getResource().getName() + "\" on " + booking.getDate() + " was rejected. Reason: " + reason,
+            Notification.NotificationType.BOOKING_REJECTED,
+            booking.getId()
+        );
+        return saved;
     }
 
     public Booking cancel(Long id) {

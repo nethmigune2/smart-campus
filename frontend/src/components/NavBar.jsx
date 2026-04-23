@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { LayoutDashboard, BookOpen, CalendarCheck, Wrench, Bell, LogOut, GraduationCap, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import axios from 'axios'
 
 const LINKS = [
   { to: '/dashboard',     icon: LayoutDashboard, label: 'Dashboard',   roles: null },
@@ -21,9 +22,18 @@ const ROLE_STYLE = {
 export default function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const [hoveredLink, setHoveredLink]   = useState(null)
+  const location = useLocation()
+  const [hoveredLink,   setHoveredLink]   = useState(null)
   const [logoutHovered, setLogoutHovered] = useState(false)
-  const [bellHovered, setBellHovered]   = useState(false)
+  const [bellHovered,   setBellHovered]   = useState(false)
+  const [unreadCount,   setUnreadCount]   = useState(0)
+
+  useEffect(() => {
+    if (!user?.id) return
+    axios.get('/api/notifications/unread-count')
+      .then(r => setUnreadCount(r.data.count || 0))
+      .catch(() => {})
+  }, [user, location.pathname])
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
@@ -88,13 +98,15 @@ export default function Navbar() {
               <>
                 <Icon size={15} />
                 <span style={{ flex: 1 }}>{label}</span>
-                {/* Notification dot on Alerts link */}
-                {to === '/notifications' && !isActive && (
+                {/* Unread count badge on Alerts link */}
+                {to === '/notifications' && unreadCount > 0 && (
                   <span style={{
-                    width: 7, height: 7, borderRadius: '50%',
-                    background: '#ef4444', flexShrink: 0,
-                    boxShadow: '0 0 0 2px #1e293b',
-                  }} />
+                    minWidth: 16, height: 16, borderRadius: 8,
+                    background: '#ef4444', color: '#fff',
+                    fontSize: 9, fontWeight: 700,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '0 4px', flexShrink: 0,
+                  }}>{unreadCount > 9 ? '9+' : unreadCount}</span>
                 )}
               </>
             )}
@@ -121,11 +133,15 @@ export default function Navbar() {
         >
           <div style={{ position: 'relative' }}>
             <Bell size={15} />
-            <span style={{
-              position: 'absolute', top: -3, right: -3,
-              width: 7, height: 7, borderRadius: '50%',
-              background: '#ef4444', border: '1.5px solid #1e293b',
-            }} />
+            {unreadCount > 0 && (
+              <span style={{
+                position: 'absolute', top: -4, right: -4,
+                minWidth: 14, height: 14, borderRadius: 7,
+                background: '#ef4444', border: '1.5px solid #1e293b',
+                fontSize: 8, fontWeight: 700, color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 2px',
+              }}>{unreadCount > 9 ? '9+' : unreadCount}</span>
+            )}
           </div>
           <span>Notifications</span>
         </button>
