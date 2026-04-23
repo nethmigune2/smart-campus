@@ -154,24 +154,30 @@ export default function Dashboard() {
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   const firstName = user?.name?.split(' ')[0] || 'there'
 
-  const avatar = user?.picture || user?.imageUrl || null
+  const avatar = user?.avatarUrl || null
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
 
   useEffect(() => {
+    if (!user?.id) return
+    const bookingUrl = user.role === 'ADMIN'
+      ? '/api/bookings'
+      : `/api/bookings/user/${user.id}`
     Promise.all([
       axios.get('/api/resources').catch(() => ({ data: [] })),
-      axios.get('/api/bookings').catch(() => ({ data: [] })),
+      axios.get(bookingUrl).catch(() => ({ data: [] })),
     ]).then(([rRes, bRes]) => {
       setResources(rRes.data)
       setBookings(bRes.data)
     }).finally(() => setLoading(false))
-  }, [])
+  }, [user])
 
-  const availableNow   = resources.filter(r => r.status === 'ACTIVE').length
+  const availableNow   = resources.filter(r => r.status === 'AVAILABLE').length
   const pendingCount   = bookings.filter(b => b.status === 'PENDING').length
-  const allMyBookings  = bookings.filter(b => b.user?.id === user?.id || b.user?.email === user?.email)
+  const allMyBookings  = user?.role === 'ADMIN'
+    ? bookings
+    : bookings.filter(b => b.user?.id === user?.id || b.user?.email === user?.email)
   const recentActivity = allMyBookings.slice(0, 5)
 
   /* ── STATS ── */
@@ -297,7 +303,7 @@ export default function Dashboard() {
               padding: '10px 0', borderBottom: '1px solid #0f172a',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: r.status === 'ACTIVE' ? '#34d399' : '#475569', flexShrink: 0 }} />
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: r.status === 'AVAILABLE' ? '#34d399' : '#475569', flexShrink: 0 }} />
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>{r.name}</div>
                   <div style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>{r.location} · Cap: {r.capacity}</div>
@@ -305,8 +311,8 @@ export default function Dashboard() {
               </div>
               <span style={{
                 fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4,
-                color: r.status === 'ACTIVE' ? '#34d399' : '#94a3b8',
-                background: r.status === 'ACTIVE' ? '#064e3b' : '#1e293b',
+                color: r.status === 'AVAILABLE' ? '#34d399' : '#94a3b8',
+                background: r.status === 'AVAILABLE' ? '#064e3b' : '#1e293b',
                 textTransform: 'uppercase', letterSpacing: '.05em',
               }}>
                 {r.status}

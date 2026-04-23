@@ -8,6 +8,7 @@ import AuthCallback from './pages/AuthCallback'
 import Dashboard from './pages/Dashboard'
 import ResourcesPage from './pages/ResourcesPage'
 import BookingsPage from './pages/BookingsPage'
+import AdminPage from './pages/AdminPage'
 
 function RequireRole({ roles, children }) {
   const { user } = useAuth()
@@ -32,7 +33,7 @@ function AppLayout() {
           <Route path="/notifications" element={<PlaceholderPage title="Alerts & Notifications" desc="Notification centre — coming soon." />} />
           <Route path="/admin"         element={
             <RequireRole roles={['ADMIN']}>
-              <PlaceholderPage title="Admin Panel" desc="User management and system administration." />
+              <AdminPage />
             </RequireRole>
           } />
           <Route path="*"              element={<Navigate to="/dashboard" replace />} />

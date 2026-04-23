@@ -81,9 +81,21 @@ export default function BookingsPage() {
   const openCreate = () => { setForm(EMPTY_FORM); setShowModal(true) }
   const closeModal = () => { setShowModal(false); setForm(EMPTY_FORM) }
 
+  const selectedResource = resources.find(r => String(r.id) === String(form.resourceId))
+
   const handleBook = async () => {
     if (!form.resourceId || !form.date || !form.startTime || !form.endTime || !form.purpose) {
       toast.error('Please fill in all required fields'); return
+    }
+    if (selectedResource?.capacity && form.attendees && parseInt(form.attendees) > selectedResource.capacity) {
+      toast.error(`Attendees exceed the maximum capacity of ${selectedResource.capacity}`); return
+    }
+    if (selectedResource?.availabilityStart && selectedResource?.availabilityEnd) {
+      const avStart = selectedResource.availabilityStart.slice(0, 5)
+      const avEnd   = selectedResource.availabilityEnd.slice(0, 5)
+      if (form.startTime < avStart || form.startTime > avEnd || form.endTime > avEnd) {
+        toast.error(`This resource is only available from ${avStart} to ${avEnd}`); return
+      }
     }
     setSaving(true)
     try {
@@ -301,13 +313,32 @@ export default function BookingsPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
                 <label style={S.label}>Resource *</label>
-                <select style={S.select} value={form.resourceId} onChange={e => setForm(f => ({ ...f, resourceId: e.target.value }))}>
+                <select style={S.select} value={form.resourceId} onChange={e => setForm(f => ({ ...f, resourceId: e.target.value, startTime: '', endTime: '', attendees: '' }))}>
                   <option value="">Select a resource…</option>
                   {resources.map(r => (
                     <option key={r.id} value={r.id}>{r.name} — {r.location} (cap: {r.capacity})</option>
                   ))}
                 </select>
               </div>
+
+              {/* Resource info banner */}
+              {selectedResource && (
+                <div style={{ padding: '10px 12px', background: '#0f172a', border: '1px solid #334155', borderRadius: 8, display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: 12, color: '#94a3b8' }}>
+                    <span style={{ color: '#64748b', fontWeight: 600 }}>Max capacity: </span>
+                    <span style={{ color: '#f1f5f9', fontWeight: 700 }}>{selectedResource.capacity} people</span>
+                  </div>
+                  {selectedResource.availabilityStart && (
+                    <div style={{ fontSize: 12, color: '#94a3b8' }}>
+                      <span style={{ color: '#64748b', fontWeight: 600 }}>Available: </span>
+                      <span style={{ color: '#f1f5f9', fontWeight: 700 }}>
+                        {selectedResource.availabilityStart.slice(0, 5)} – {selectedResource.availabilityEnd.slice(0, 5)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div>
                 <label style={S.label}>Date *</label>
                 <input style={S.input} type="date" min={new Date().toISOString().split('T')[0]} value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
@@ -315,11 +346,47 @@ export default function BookingsPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={S.label}>Start Time *</label>
-                  <input style={S.input} type="time" value={form.startTime} onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))} />
+                  <input
+                    style={{
+                      ...S.input,
+                      borderColor: selectedResource?.availabilityStart && form.startTime &&
+                        (form.startTime < selectedResource.availabilityStart.slice(0, 5) ||
+                         form.startTime > selectedResource.availabilityEnd.slice(0, 5))
+                        ? '#ef4444' : '#334155'
+                    }}
+                    type="time" value={form.startTime}
+                    min={selectedResource?.availabilityStart?.slice(0, 5)}
+                    max={selectedResource?.availabilityEnd?.slice(0, 5)}
+                    onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))}
+                  />
+                  {selectedResource?.availabilityStart && form.startTime &&
+                    (form.startTime < selectedResource.availabilityStart.slice(0, 5) ||
+                     form.startTime > selectedResource.availabilityEnd.slice(0, 5)) && (
+                    <div style={{ fontSize: 11, color: '#ef4444', marginTop: 4 }}>
+                      ⚠ Must be between {selectedResource.availabilityStart.slice(0, 5)} – {selectedResource.availabilityEnd.slice(0, 5)}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label style={S.label}>End Time *</label>
-                  <input style={S.input} type="time" value={form.endTime} onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))} />
+                  <input
+                    style={{
+                      ...S.input,
+                      borderColor: selectedResource?.availabilityEnd && form.endTime &&
+                        form.endTime > selectedResource.availabilityEnd.slice(0, 5)
+                        ? '#ef4444' : '#334155'
+                    }}
+                    type="time" value={form.endTime}
+                    min={selectedResource?.availabilityStart?.slice(0, 5)}
+                    max={selectedResource?.availabilityEnd?.slice(0, 5)}
+                    onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
+                  />
+                  {selectedResource?.availabilityEnd && form.endTime &&
+                    form.endTime > selectedResource.availabilityEnd.slice(0, 5) && (
+                    <div style={{ fontSize: 11, color: '#ef4444', marginTop: 4 }}>
+                      ⚠ Available until {selectedResource.availabilityEnd.slice(0, 5)}
+                    </div>
+                  )}
                 </div>
               </div>
               <div>
@@ -328,7 +395,18 @@ export default function BookingsPage() {
               </div>
               <div>
                 <label style={S.label}>Expected Attendees</label>
-                <input style={S.input} type="number" min="1" placeholder="e.g. 25" value={form.attendees} onChange={e => setForm(f => ({ ...f, attendees: e.target.value }))} />
+                <input
+                  style={{ ...S.input, borderColor: selectedResource?.capacity && form.attendees && parseInt(form.attendees) > selectedResource.capacity ? '#ef4444' : '#334155' }}
+                  type="number" min="1"
+                  placeholder={selectedResource ? `Max ${selectedResource.capacity}` : 'e.g. 25'}
+                  value={form.attendees}
+                  onChange={e => setForm(f => ({ ...f, attendees: e.target.value }))}
+                />
+                {selectedResource?.capacity && form.attendees && parseInt(form.attendees) > selectedResource.capacity && (
+                  <div style={{ fontSize: 11, color: '#ef4444', marginTop: 5 }}>
+                    ⚠ Exceeds maximum capacity of {selectedResource.capacity} people
+                  </div>
+                )}
               </div>
             </div>
 
