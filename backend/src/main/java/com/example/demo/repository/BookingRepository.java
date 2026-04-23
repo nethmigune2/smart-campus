@@ -17,7 +17,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByStatus(Booking.BookingStatus status);
 
+    long countByStatus(Booking.BookingStatus status);
+
     List<Booking> findByResourceId(Long resourceId);
+
+    @Query("SELECT r.name, COUNT(b) FROM Booking b JOIN b.resource r GROUP BY r.id, r.name ORDER BY COUNT(b) DESC")
+    List<Object[]> findTopResources();
 
     // Conflict check: any approved/pending booking for same resource on same date with overlapping time
     @Query("SELECT b FROM Booking b WHERE b.resource.id = :resourceId " +

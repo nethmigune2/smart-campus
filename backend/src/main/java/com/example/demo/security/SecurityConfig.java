@@ -63,6 +63,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/tickets/files/**").permitAll()
                 .requestMatchers("/api/tickets/**").authenticated()
                 .requestMatchers("/api/notifications/**").authenticated()
+                .requestMatchers("/api/analytics/**").authenticated()
                 .anyRequest().authenticated()
             );
 
