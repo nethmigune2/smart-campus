@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, BookOpen, CalendarCheck, Wrench, Bell, LogOut, GraduationCap, ShieldCheck } from 'lucide-react'
+import { LayoutDashboard, BookOpen, CalendarCheck, Wrench, Bell, LogOut, GraduationCap, ShieldCheck, Map } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import axios from 'axios'
 
@@ -9,6 +9,7 @@ const LINKS = [
   { to: '/resources',     icon: BookOpen,         label: 'Resources',   roles: null },
   { to: '/bookings',      icon: CalendarCheck,    label: 'Bookings',    roles: null },
   { to: '/tickets',       icon: Wrench,           label: 'Maintenance', roles: null },
+  { to: '/map',           icon: Map,              label: 'Campus Map',  roles: null },
   { to: '/notifications', icon: Bell,             label: 'Alerts',      roles: null },
   { to: '/admin',         icon: ShieldCheck,      label: 'Admin Panel', roles: ['ADMIN'] },
 ]
