@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, BookOpen, CalendarCheck, Wrench, Bell, LogOut, GraduationCap } from 'lucide-react'
+import { LayoutDashboard, BookOpen, CalendarCheck, Wrench, Bell, LogOut, GraduationCap, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const LINKS = [
-  { to: '/dashboard',     icon: LayoutDashboard, label: 'Dashboard'   },
-  { to: '/resources',     icon: BookOpen,         label: 'Resources'   },
-  { to: '/bookings',      icon: CalendarCheck,    label: 'Bookings'    },
-  { to: '/tickets',       icon: Wrench,           label: 'Maintenance' },
-  { to: '/notifications', icon: Bell,             label: 'Alerts'      },
+  { to: '/dashboard',     icon: LayoutDashboard, label: 'Dashboard',   roles: null },
+  { to: '/resources',     icon: BookOpen,         label: 'Resources',   roles: null },
+  { to: '/bookings',      icon: CalendarCheck,    label: 'Bookings',    roles: null },
+  { to: '/tickets',       icon: Wrench,           label: 'Maintenance', roles: null },
+  { to: '/notifications', icon: Bell,             label: 'Alerts',      roles: null },
+  { to: '/admin',         icon: ShieldCheck,      label: 'Admin Panel', roles: ['ADMIN'] },
 ]
 
 const ROLE_STYLE = {
@@ -28,7 +29,7 @@ export default function Navbar() {
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
 
-  const avatar    = user?.picture || user?.imageUrl || null
+  const avatar    = user?.avatarUrl || null
   const roleStyle = ROLE_STYLE[user?.role] || { color: '#475569', bg: '#1e293b' }
 
   return (
@@ -66,7 +67,7 @@ export default function Navbar() {
           NAVIGATION
         </div>
 
-        {LINKS.map(({ to, icon: Icon, label }) => (
+        {LINKS.filter(link => !link.roles || link.roles.includes(user?.role)).map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}

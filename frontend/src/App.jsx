@@ -9,6 +9,13 @@ import Dashboard from './pages/Dashboard'
 import ResourcesPage from './pages/ResourcesPage'
 import BookingsPage from './pages/BookingsPage'
 
+function RequireRole({ roles, children }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  if (!roles.includes(user.role)) return <Navigate to="/dashboard" replace />
+  return children
+}
+
 function AppLayout() {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
@@ -23,6 +30,11 @@ function AppLayout() {
           <Route path="/bookings"      element={<BookingsPage />} />
           <Route path="/tickets"       element={<PlaceholderPage title="Maintenance Tickets" desc="Incident ticketing module — coming soon." />} />
           <Route path="/notifications" element={<PlaceholderPage title="Alerts & Notifications" desc="Notification centre — coming soon." />} />
+          <Route path="/admin"         element={
+            <RequireRole roles={['ADMIN']}>
+              <PlaceholderPage title="Admin Panel" desc="User management and system administration." />
+            </RequireRole>
+          } />
           <Route path="*"              element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </main>
