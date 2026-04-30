@@ -1,0 +1,329 @@
+{
+  "info": {
+    "_postman_id": "smart-campus-001",
+    "name": "Smart Campus API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Resources",
+      "item": [
+        {
+          "name": "Get All Resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/resources", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","resources"] }
+          }
+        },
+        {
+          "name": "Get Resource by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/resources/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","resources","1"] }
+          }
+        },
+        {
+          "name": "Search Resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/resources/search?type=LAB&location=Wing A&minCapacity=20", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","resources","search"], "query": [{"key":"type","value":"LAB"},{"key":"location","value":"Wing A"},{"key":"minCapacity","value":"20"}] }
+          }
+        },
+        {
+          "name": "Create Resource (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Lab B1\",\n  \"type\": \"LAB\",\n  \"capacity\": 30,\n  \"location\": \"Wing B\",\n  \"availabilityStart\": \"08:00\",\n  \"availabilityEnd\": \"18:00\",\n  \"status\": \"AVAILABLE\",\n  \"description\": \"Computer lab\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/resources", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","resources"] }
+          }
+        },
+        {
+          "name": "Update Resource (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Lab B1 Updated\",\n  \"type\": \"LAB\",\n  \"capacity\": 40,\n  \"location\": \"Wing B\",\n  \"availabilityStart\": \"08:00\",\n  \"availabilityEnd\": \"18:00\",\n  \"status\": \"AVAILABLE\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/resources/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","resources","1"] }
+          }
+        },
+        {
+          "name": "Delete Resource (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/resources/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","resources","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Get All Bookings (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/bookings", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings"] }
+          }
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/bookings/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings","1"] }
+          }
+        },
+        {
+          "name": "Get Bookings by User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/bookings/user/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings","user","1"] }
+          }
+        },
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"resourceId\": 1,\n  \"userId\": 1,\n  \"date\": \"2026-05-01\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"11:00\",\n  \"purpose\": \"Project meeting\",\n  \"attendees\": 10\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/bookings", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings"] }
+          }
+        },
+        {
+          "name": "Approve Booking (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/bookings/1/approve", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings","1","approve"] }
+          }
+        },
+        {
+          "name": "Reject Booking (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"reason\": \"Room unavailable for maintenance\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/bookings/1/reject", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings","1","reject"] }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/bookings/1/cancel", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings","1","cancel"] }
+          }
+        },
+        {
+          "name": "Delete Booking (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/bookings/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","bookings","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "Get All Tickets (Admin-Staff)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/tickets", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets"] }
+          }
+        },
+        {
+          "name": "Get My Tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/tickets/my", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","my"] }
+          }
+        },
+        {
+          "name": "Get Ticket by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/tickets/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1"] }
+          }
+        },
+        {
+          "name": "Create Ticket",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [{"key":"title","value":"Projector not working","type":"text"},{"key":"description","value":"The projector in Lab B1 is not displaying","type":"text"},{"key":"category","value":"IT_EQUIPMENT","type":"text"},{"key":"priority","value":"HIGH","type":"text"},{"key":"location","value":"Wing B","type":"text"},{"key":"contactName","value":"John Doe","type":"text"},{"key":"contactPhone","value":"0771234567","type":"text"}] },
+            "url": { "raw": "http://localhost:8080/api/tickets", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets"] }
+          }
+        },
+        {
+          "name": "Update Ticket Status (Admin-Staff)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"resolutionNotes\": \"Technician assigned\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/tickets/1/status", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1","status"] }
+          }
+        },
+        {
+          "name": "Assign Ticket (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"assigneeId\": 2\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/tickets/1/assign", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1","assign"] }
+          }
+        },
+        {
+          "name": "Delete Ticket (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/tickets/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1"] }
+          }
+        },
+        {
+          "name": "Get Ticket Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/tickets/1/comments", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1","comments"] }
+          }
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Issue is being investigated\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/tickets/1/comments", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1","comments"] }
+          }
+        },
+        {
+          "name": "Edit Comment",
+          "request": {
+            "method": "PUT",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Updated comment text\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/tickets/1/comments/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1","comments","1"] }
+          }
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/tickets/1/comments/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","tickets","1","comments","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/notifications", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications"] }
+          }
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/notifications/unread-count", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications","unread-count"] }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/notifications/1/read", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications","1","read"] }
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/notifications/read-all", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications","read-all"] }
+          }
+        },
+        {
+          "name": "Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/notifications/1", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","notifications","1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth and Users",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/auth/me", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","auth","me"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/auth/logout", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","auth","logout"] }
+          }
+        },
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/auth/users", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","auth","users"] }
+          }
+        },
+        {
+          "name": "Update User Role (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"STAFF\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "http://localhost:8080/api/auth/users/1/role", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","auth","users","1","role"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Analytics Summary (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:8080/api/analytics/summary", "protocol": "http", "host": ["localhost"], "port": "8080", "path": ["api","analytics","summary"] }
+          }
+        }
+      ]
+    }
+  ]
+}
